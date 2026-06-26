@@ -1,0 +1,208 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0f1117;
+  color: #e1e4ea;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+}
+
+#root {
+  width: 100%;
+  max-width: 780px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f0f2f5;
+  margin-bottom: 6px;
+}
+
+.header p {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-play {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.btn-play:hover {
+  background: #2563eb;
+}
+
+.btn-pause {
+  background: #f59e0b;
+  color: #1a1a1a;
+}
+
+.btn-pause:hover {
+  background: #d97706;
+}
+
+.btn-stop {
+  background: #1e1e2a;
+  color: #9ca3af;
+  border: 1px solid #2a2a3a;
+}
+
+.btn-stop:hover {
+  background: #27273a;
+  color: #d1d5db;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Voice selector */
+.voice-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.voice-select label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.voice-select select {
+  background: #1a1b26;
+  color: #c9cdd5;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.voice-select select:focus {
+  border-color: #3b82f6;
+}
+
+
+
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #1e1e2a;
+  border-radius: 2px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Text display */
+.text-display {
+  background: #161822;
+  border: 1px solid #1e2030;
+  border-radius: 12px;
+  padding: 32px;
+  line-height: 2;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+}
+
+.word {
+  display: inline;
+  padding: 2px 1px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  cursor: default;
+}
+
+/* Active word highlight */
+.word.active {
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0 -3px;
+}
+
+/* Already spoken words get a subtle dim */
+.word.spoken {
+  color: #6b7280;
+}
+
+/* Status indicator */
+.status {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+
+.status .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.dot.idle { background: #4b5563; }
+.dot.playing { background: #22c55e; animation: pulse 1.2s infinite; }
+.dot.paused { background: #f59e0b; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
