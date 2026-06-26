@@ -15,23 +15,18 @@ function App() {
   // Split text into words once
   const words = SAMPLE_TEXT.split(/\s+/)
 
-  // Build a char-index-to-word-index map for boundary events
-  // SpeechSynthesis fires 'boundary' with charIndex - we map that to word index
   const charToWordMap = useRef(null)
   if (!charToWordMap.current) {
     const map = []
     let charPos = 0
     words.forEach((word, i) => {
-      // Mark each char position in this word as belonging to word index i
       for (let c = 0; c < word.length; c++) {
         map[charPos + c] = i
       }
-      charPos += word.length + 1 // +1 for the space
+      charPos += word.length + 1
     })
     charToWordMap.current = map
   }
-
-  // Load available voices
 
   const loadVoices = () => {
     const available = speechSynthesis.getVoices()
@@ -108,7 +103,7 @@ function App() {
     setStatus('paused')
   }, [])
 
-  // Cleanup on unmount
+
   useEffect(() => {
     return () => speechSynthesis.cancel()
   }, [])
