@@ -199,20 +199,16 @@ function App() {
     return runTimer
   }, [])
 
-  // Fetch TTS audio through Vite proxy (server-side) → blob URL → Audio element
-  // This completely bypasses browser CORS restrictions since fetch goes via proxy.
-  // lang: 'en-IN' for Indian English accent, 'ml' for native Kerala Malayalam
+  // Fetch TTS audio through /api/tts
+  //   Dev:  Vite proxy rewrites /api/tts → translate.google.com (strips Referer)
+  //   Prod: Vercel serverless function api/tts.js fetches server-side (no CORS)
+  // lang: 'en-IN' = Indian English accent | 'ml' = Kerala Malayalam
   const fetchTtsAudio = useCallback(async (text, lang, onError) => {
-    const params = new URLSearchParams({
-      ie: 'UTF-8',
-      tl: lang,
-      client: 'tw-ob',
-      q: text
-    })
-    const proxyUrl = `/tts-proxy/translate_tts?${params.toString()}`
+    const params = new URLSearchParams({ tl: lang, q: text })
+    const apiUrl = `/api/tts?${params.toString()}`
     try {
-      const response = await fetch(proxyUrl)
-      if (!response.ok) throw new Error(`TTS server responded ${response.status}`)
+      const response = await fetch(apiUrl)
+      if (!response.ok) throw new Error(`TTS responded ${response.status}`)
       const blob = await response.blob()
       const objectUrl = URL.createObjectURL(blob)
       objectUrlsRef.current.push(objectUrl)
@@ -223,6 +219,7 @@ function App() {
       return null
     }
   }, [])
+
 
   // Sequential Playback Step runner — fetches audio via proxy as blob, then plays
   const speakStep = useCallback(async (paraIdx, sentenceIdx, lang) => {
