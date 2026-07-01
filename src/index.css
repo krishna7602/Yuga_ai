@@ -191,7 +191,7 @@ body {
   line-height: 1.4;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .engine-status-badge {
     grid-column: span 1;
   }
@@ -283,7 +283,7 @@ body {
   gap: 24px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .paragraph-subgrid {
     grid-template-columns: 1fr;
   }

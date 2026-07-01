@@ -24,7 +24,21 @@ function App() {
   const [quizFinished, setQuizFinished] = useState(false)
 
   // Refs for tracking active playing parameters in callbacks safely
-  const activeAudioRef = useRef(null)
+  const audioPlayerRef = useRef(null)
+  if (!audioPlayerRef.current) {
+    audioPlayerRef.current = new Audio()
+  }
+
+  const unlockAudio = useCallback(() => {
+    if (audioPlayerRef.current) {
+      if (!audioPlayerRef.current.src) {
+        const SILENT_AUDIO_SRC = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAAA'
+        audioPlayerRef.current.src = SILENT_AUDIO_SRC
+        audioPlayerRef.current.play().catch(() => {})
+      }
+    }
+  }, [])
+
   const playModeRef = useRef('idle')
   const playIndexRef = useRef(-1)
   const playLangRef = useRef('en')
@@ -142,13 +156,12 @@ function App() {
 
   // Stop any playing speech and clear simulation timers
   const stop = useCallback(() => {
-    if (activeAudioRef.current) {
-      activeAudioRef.current.pause()
-      activeAudioRef.current.onended = null
-      activeAudioRef.current.onerror = null
-      activeAudioRef.current.onloadedmetadata = null
-      activeAudioRef.current.onplay = null
-      activeAudioRef.current = null
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause()
+      audioPlayerRef.current.onended = null
+      audioPlayerRef.current.onerror = null
+      audioPlayerRef.current.onloadedmetadata = null
+      audioPlayerRef.current.src = ''
     }
     if (simulationIntervalRef.current) {
       clearInterval(simulationIntervalRef.current)
@@ -212,7 +225,7 @@ function App() {
       const blob = await response.blob()
       const objectUrl = URL.createObjectURL(blob)
       objectUrlsRef.current.push(objectUrl)
-      return new Audio(objectUrl)
+      return objectUrl
     } catch (err) {
       console.error(`TTS fetch failed for lang=${lang}:`, err)
       if (onError) onError(err)
@@ -231,11 +244,11 @@ function App() {
   // ────────────────────────────────────────────────────────────────────────────
   const speakPhrase = useCallback(async (paraIdx, sentenceIdx, phraseIdx, isEnglish) => {
     // Clean up previous audio
-    if (activeAudioRef.current) {
-      activeAudioRef.current.pause()
-      activeAudioRef.current.onended = null
-      activeAudioRef.current.onerror = null
-      activeAudioRef.current = null
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause()
+      audioPlayerRef.current.onended = null
+      audioPlayerRef.current.onerror = null
+      audioPlayerRef.current.onloadedmetadata = null
     }
     if (simulationIntervalRef.current) {
       clearInterval(simulationIntervalRef.current)
@@ -294,18 +307,20 @@ function App() {
       // Start estimated timer immediately so highlights appear without waiting for fetch
       triggerTimer(phraseWords.length * (310 / speechRate))
 
-      const audio = await fetchTtsAudio(phraseText, 'en-IN', onEnglishDone)
-      if (!audio) return
+      const audioUrl = await fetchTtsAudio(phraseText, 'en-IN', onEnglishDone)
+      if (!audioUrl) return
 
-      audio.onloadedmetadata = () => {
-        if (audio.duration && audio.duration > 0)
-          triggerTimer((audio.duration * 1000) / speechRate)
+      audioPlayerRef.current.onloadedmetadata = () => {
+        if (audioPlayerRef.current.duration && audioPlayerRef.current.duration > 0) {
+          const runTimer = startSimulationTimer(phraseWords, wordOffset, null)
+          runTimer((audioPlayerRef.current.duration * 1000) / speechRate)
+        }
       }
-      audio.playbackRate = speechRate
-      activeAudioRef.current = audio
-      audio.onended = () => onEnglishDone()
-      audio.onerror = () => onEnglishDone()
-      audio.play().catch(() => onEnglishDone())
+      audioPlayerRef.current.onended = () => onEnglishDone()
+      audioPlayerRef.current.onerror = () => onEnglishDone()
+      audioPlayerRef.current.src = audioUrl
+      audioPlayerRef.current.playbackRate = speechRate
+      audioPlayerRef.current.play().catch(() => onEnglishDone())
 
     } else {
       // ── Read Malayalam phrase, then advance to next English phrase ──────────
@@ -317,14 +332,15 @@ function App() {
         speakPhrase(paraIdx, sentenceIdx, phraseIdx + 1, true)
       }
 
-      const audio = await fetchTtsAudio(phrase.malayalam, 'ml', onMalayalamDone)
-      if (!audio) return
+      const audioUrl = await fetchTtsAudio(phrase.malayalam, 'ml', onMalayalamDone)
+      if (!audioUrl) return
 
-      audio.playbackRate = speechRate * 0.85
-      activeAudioRef.current = audio
-      audio.onended = () => onMalayalamDone()
-      audio.onerror = () => onMalayalamDone()
-      audio.play().catch(() => onMalayalamDone())
+      audioPlayerRef.current.onloadedmetadata = null
+      audioPlayerRef.current.onended = () => onMalayalamDone()
+      audioPlayerRef.current.onerror = () => onMalayalamDone()
+      audioPlayerRef.current.src = audioUrl
+      audioPlayerRef.current.playbackRate = speechRate * 0.85
+      audioPlayerRef.current.play().catch(() => onMalayalamDone())
     }
   }, [speechRate, startSimulationTimer, stop, fetchTtsAudio])
 
@@ -336,6 +352,7 @@ function App() {
   // ─── Grammar Lecture voice-over ──────────────────────────────────────────
   // Plays: English explanation → Malayalam explanation → example 1 EN → example 1 ML → …
   const playGrammarItem = useCallback(async (item) => {
+    unlockAudio()
     stop()
     setPlayMode('explanation')
     setStatus('playing')
@@ -356,21 +373,24 @@ function App() {
 
       const playChunk = async (ci) => {
         if (ci >= chunks.length) { playItem(idx + 1); return }
-        const audio = await fetchTtsAudio(chunks[ci], lang, () => playChunk(ci + 1))
-        if (!audio) { playChunk(ci + 1); return }
-        audio.playbackRate = lang === 'ml' ? speechRate * 0.85 : speechRate
-        activeAudioRef.current = audio
-        audio.onended = () => playChunk(ci + 1)
-        audio.onerror = () => playChunk(ci + 1)
-        audio.play().catch(() => playChunk(ci + 1))
+        const audioUrl = await fetchTtsAudio(chunks[ci], lang, () => playChunk(ci + 1))
+        if (!audioUrl) { playChunk(ci + 1); return }
+        
+        audioPlayerRef.current.onloadedmetadata = null
+        audioPlayerRef.current.onended = () => playChunk(ci + 1)
+        audioPlayerRef.current.onerror = () => playChunk(ci + 1)
+        audioPlayerRef.current.src = audioUrl
+        audioPlayerRef.current.playbackRate = lang === 'ml' ? speechRate * 0.85 : speechRate
+        audioPlayerRef.current.play().catch(() => playChunk(ci + 1))
       }
       playChunk(0)
     }
     playItem(0)
-  }, [speechRate, splitTextIntoChunks, stop, fetchTtsAudio])
+  }, [speechRate, splitTextIntoChunks, stop, fetchTtsAudio, unlockAudio])
 
   // Play a quiz explanation in Malayalam — chunked sequential blob playback
   const playExplanation = useCallback(async (explanationText) => {
+    unlockAudio()
     stop()
     setPlayMode('explanation')
     setStatus('playing')
@@ -379,28 +399,31 @@ function App() {
 
     const playChunk = async (idx) => {
       if (idx >= chunks.length) { stop(); return }
-      const audio = await fetchTtsAudio(chunks[idx], 'ml', () => playChunk(idx + 1))
-      if (!audio) return
-      audio.playbackRate = speechRate * 0.85
-      activeAudioRef.current = audio
-      audio.onended = () => playChunk(idx + 1)
-      audio.onerror = () => playChunk(idx + 1)
-      audio.play().catch(() => playChunk(idx + 1))
+      const audioUrl = await fetchTtsAudio(chunks[idx], 'ml', () => playChunk(idx + 1))
+      if (!audioUrl) return
+      
+      audioPlayerRef.current.onloadedmetadata = null
+      audioPlayerRef.current.onended = () => playChunk(idx + 1)
+      audioPlayerRef.current.onerror = () => playChunk(idx + 1)
+      audioPlayerRef.current.src = audioUrl
+      audioPlayerRef.current.playbackRate = speechRate * 0.85
+      audioPlayerRef.current.play().catch(() => playChunk(idx + 1))
     }
 
     playChunk(0)
-  }, [speechRate, splitTextIntoChunks, stop, fetchTtsAudio])
+  }, [speechRate, splitTextIntoChunks, stop, fetchTtsAudio, unlockAudio])
 
   // Resume paused audio
   const resume = useCallback(() => {
-    if (activeAudioRef.current) {
+    if (audioPlayerRef.current && audioPlayerRef.current.src) {
       setStatus('playing')
-      activeAudioRef.current.play().catch(err => console.error('Resume failed:', err))
+      audioPlayerRef.current.play().catch(err => console.error('Resume failed:', err))
     }
   }, [])
 
   // Play the entire paragraph sequentially (phrase by phrase)
   const playParagraph = useCallback((paraIdx) => {
+    unlockAudio()
     if (status === 'paused' && playingParaIdx === paraIdx) {
       resume()
       return
@@ -408,10 +431,11 @@ function App() {
     stop()
     setPlayMode('paragraph')
     speakPhrase(paraIdx, 0, 0, true)
-  }, [status, playingParaIdx, speakPhrase, stop, resume])
+  }, [status, playingParaIdx, speakPhrase, stop, resume, unlockAudio])
 
   // Play a single sentence phrase-by-phrase then stop
   const playSentence = useCallback((paraIdx, _sentenceText, sentenceId) => {
+    unlockAudio()
     stop()
     const targetPara = STUDY_DATA[paraIdx]
     if (!targetPara) return
@@ -420,12 +444,12 @@ function App() {
       setPlayMode('sentence')
       speakPhrase(paraIdx, idx, 0, true)
     }
-  }, [speakPhrase, stop])
+  }, [speakPhrase, stop, unlockAudio])
 
   // Pause playback
   const pause = useCallback(() => {
-    if (activeAudioRef.current) {
-      activeAudioRef.current.pause()
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause()
     }
     if (simulationIntervalRef.current) {
       clearInterval(simulationIntervalRef.current)
@@ -438,9 +462,9 @@ function App() {
   // Clean speech, timers and blob object URLs on unmount
   useEffect(() => {
     return () => {
-      if (activeAudioRef.current) {
-        activeAudioRef.current.pause()
-        activeAudioRef.current = null
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause()
+        audioPlayerRef.current.src = ''
       }
       if (simulationIntervalRef.current) clearInterval(simulationIntervalRef.current)
       objectUrlsRef.current.forEach(u => URL.revokeObjectURL(u))
