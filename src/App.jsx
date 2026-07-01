@@ -221,14 +221,20 @@ function App() {
   }, [])
 
 
-  // Sequential Playback Step runner — fetches audio via proxy as blob, then plays
-  const speakStep = useCallback(async (paraIdx, sentenceIdx, lang) => {
+  // ─── Phrase-by-phrase bilingual reading ────────────────────────────────────
+  // Pattern per sentence: English phrase 0 → Malayalam phrase 0 →
+  //                       English phrase 1 → Malayalam phrase 1 → … → next sentence
+  //
+  // speakPhrase(paraIdx, sentenceIdx, phraseIdx, isEnglish)
+  //   isEnglish=true  → read phrase[phraseIdx].english, then call back with isEnglish=false
+  //   isEnglish=false → read phrase[phraseIdx].malayalam, advance phraseIdx
+  // ────────────────────────────────────────────────────────────────────────────
+  const speakPhrase = useCallback(async (paraIdx, sentenceIdx, phraseIdx, isEnglish) => {
+    // Clean up previous audio
     if (activeAudioRef.current) {
       activeAudioRef.current.pause()
       activeAudioRef.current.onended = null
       activeAudioRef.current.onerror = null
-      activeAudioRef.current.onloadedmetadata = null
-      activeAudioRef.current.onplay = null
       activeAudioRef.current = null
     }
     if (simulationIntervalRef.current) {
@@ -238,146 +244,130 @@ function App() {
 
     const targetPara = STUDY_DATA[paraIdx]
     if (!targetPara) { stop(); return }
-
     const sentences = targetPara.sentences
-    if (sentenceIdx < 0 || sentenceIdx >= sentences.length) { stop(); return }
+    if (sentenceIdx >= sentences.length) { stop(); return }
 
     const sentence = sentences[sentenceIdx]
+    const phrases = sentence.phrases || [
+      { english: sentence.english, malayalam: sentence.malayalam }
+    ]
+
+    // Past the last phrase → advance to next sentence
+    if (phraseIdx >= phrases.length) {
+      const isFullParagraph = playModeRef.current === 'paragraph'
+      if (isFullParagraph && sentenceIdx + 1 < sentences.length) {
+        speakPhrase(paraIdx, sentenceIdx + 1, 0, true)
+      } else {
+        stop()
+      }
+      return
+    }
+
     setActiveSentenceId(sentence.id)
     setPlayIndex(sentenceIdx)
-    setPlayLang(lang)
     setPlayingParaIdx(paraIdx)
     setStatus('playing')
 
-    if (lang === 'en') {
-      const sentenceText = sentence.english
-      const sentenceWords = sentenceText.split(/\s+/).filter(Boolean)
-      const startIndex = targetPara.englishText.indexOf(sentenceText)
-      let paragraphWordOffset = 0
+    const phrase = phrases[phraseIdx]
+
+    if (isEnglish) {
+      // ── Read English phrase, highlight words in the paragraph ──────────────
+      setPlayLang('en')
+      const phraseText = phrase.english
+      const phraseWords = phraseText.split(/\s+/).filter(Boolean)
+
+      // Calculate word offset within the full paragraph text for highlighting
+      const startIndex = targetPara.englishText.indexOf(phraseText)
+      let wordOffset = 0
       if (startIndex !== -1) {
-        const precedingText = targetPara.englishText.substring(0, startIndex)
-        paragraphWordOffset = precedingText.split(/\s+/).filter(Boolean).length
+        const before = targetPara.englishText.substring(0, startIndex)
+        wordOffset = before.split(/\s+/).filter(Boolean).length
       }
 
-      const transitionToMalayalam = () => {
+      const onEnglishDone = () => {
         if (simulationIntervalRef.current) clearInterval(simulationIntervalRef.current)
-        speakStep(paraIdx, sentenceIdx, 'ml')
+        // After English phrase → read Malayalam translation of same phrase
+        speakPhrase(paraIdx, sentenceIdx, phraseIdx, false)
       }
 
-      const triggerTimer = startSimulationTimer(sentenceWords, paragraphWordOffset, transitionToMalayalam)
+      const triggerTimer = startSimulationTimer(phraseWords, wordOffset, onEnglishDone)
+      // Start estimated timer immediately so highlights appear without waiting for fetch
+      triggerTimer(phraseWords.length * (310 / speechRate))
 
-      // Use estimated timer immediately so user sees word highlights start right away
-      const estimatedDurationMs = sentenceWords.length * (310 / speechRate)
-      triggerTimer(estimatedDurationMs)
+      const audio = await fetchTtsAudio(phraseText, 'en-IN', onEnglishDone)
+      if (!audio) return
 
-      // Fetch audio blob through proxy (no CORS issues)
-      const audio = await fetchTtsAudio(sentenceText, 'en-IN', transitionToMalayalam)
-      if (!audio) return // fetchTtsAudio already called onError
-
-      // Refine timer using real audio duration once available
       audio.onloadedmetadata = () => {
-        if (audio.duration && audio.duration > 0) {
-          const realDurationMs = (audio.duration * 1000) / speechRate
-          // Restart timer with accurate duration
-          triggerTimer(realDurationMs)
-        }
+        if (audio.duration && audio.duration > 0)
+          triggerTimer((audio.duration * 1000) / speechRate)
       }
-
       audio.playbackRate = speechRate
       activeAudioRef.current = audio
+      audio.onended = () => onEnglishDone()
+      audio.onerror = () => onEnglishDone()
+      audio.play().catch(() => onEnglishDone())
 
-      audio.onended = () => transitionToMalayalam()
-      audio.onerror = (e) => {
-        console.error('English TTS audio error:', e)
-        transitionToMalayalam()
-      }
-
-      audio.play().catch(err => {
-        console.error('English audio play() failed:', err)
-        transitionToMalayalam()
-      })
     } else {
-      // Malayalam sentence — fetch and play with natural Kerala/Indian accent
-      const sentenceText = sentence.malayalam
+      // ── Read Malayalam phrase, then advance to next English phrase ──────────
+      setPlayLang('ml')
       setActiveWordIndex(-1)
 
-      const handleMalayalamEnd = () => {
-        if (playModeRef.current === 'paragraph' && sentenceIdx + 1 < targetPara.sentences.length) {
-          speakStep(paraIdx, sentenceIdx + 1, 'en')
-        } else {
-          stop()
-        }
+      const onMalayalamDone = () => {
+        // Advance to next phrase of this sentence, English side
+        speakPhrase(paraIdx, sentenceIdx, phraseIdx + 1, true)
       }
 
-      const audio = await fetchTtsAudio(sentenceText, 'ml', handleMalayalamEnd)
+      const audio = await fetchTtsAudio(phrase.malayalam, 'ml', onMalayalamDone)
       if (!audio) return
 
       audio.playbackRate = speechRate * 0.85
       activeAudioRef.current = audio
-
-      audio.onended = () => handleMalayalamEnd()
-      audio.onerror = (e) => {
-        console.error('Malayalam TTS audio error:', e)
-        handleMalayalamEnd()
-      }
-
-      audio.play().catch(err => {
-        console.error('Malayalam audio play() failed:', err)
-        handleMalayalamEnd()
-      })
+      audio.onended = () => onMalayalamDone()
+      audio.onerror = () => onMalayalamDone()
+      audio.play().catch(() => onMalayalamDone())
     }
   }, [speechRate, startSimulationTimer, stop, fetchTtsAudio])
 
-  // Resume playback
-  const resume = useCallback(() => {
-    if (activeAudioRef.current) {
-      setStatus('playing')
-      activeAudioRef.current.play().then(() => {
-        // Restart the highlighter interval if English speech was playing
-        if (playLangRef.current === 'en' && sentenceWordsRef.current.length > 0) {
-          playbackStartTimeRef.current = Date.now() - elapsedTimeRef.current
-          simulationIntervalRef.current = setInterval(() => {
-            const elapsed = Date.now() - playbackStartTimeRef.current
-            elapsedTimeRef.current = elapsed
-            const calculatedIndex = Math.floor(elapsed / msPerWordRef.current)
-            
-            if (calculatedIndex < sentenceWordsRef.current.length) {
-              setActiveWordIndex(paragraphWordOffsetRef.current + calculatedIndex)
-            } else {
-              clearInterval(simulationIntervalRef.current)
-              simulationIntervalRef.current = null
-            }
-          }, 50)
-        }
-      }).catch(err => {
-        console.error("Resume failed:", err)
-      })
-    }
-  }, [])
+  // Legacy wrapper — speakStep starts a sentence from phrase 0, English first
+  const speakStep = useCallback((paraIdx, sentenceIdx) => {
+    speakPhrase(paraIdx, sentenceIdx, 0, true)
+  }, [speakPhrase])
 
-  // Play the entire paragraph sequentially
-  const playParagraph = useCallback((paraIdx) => {
-    if (status === 'paused' && playingParaIdx === paraIdx) {
-      resume()
-      return
-    }
-
+  // ─── Grammar Lecture voice-over ──────────────────────────────────────────
+  // Plays: English explanation → Malayalam explanation → example 1 EN → example 1 ML → …
+  const playGrammarItem = useCallback(async (item) => {
     stop()
-    setPlayMode('paragraph')
-    speakStep(paraIdx, 0, 'en')
-  }, [status, playingParaIdx, speakStep, stop, resume])
+    setPlayMode('explanation')
+    setStatus('playing')
 
-  // Play a specific sentence (reads English, then reads Malayalam, then stops)
-  const playSentence = useCallback((paraIdx, sentenceText, sentenceId) => {
-    stop()
-    const targetPara = STUDY_DATA[paraIdx]
-    if (!targetPara) return
-    const idx = targetPara.sentences.findIndex(s => s.id === sentenceId)
-    if (idx !== -1) {
-      setPlayMode('sentence')
-      speakStep(paraIdx, idx, 'en')
+    // Build a flat queue: [ {text, lang}, … ]
+    const queue = []
+    queue.push({ text: item.explanation.english,  lang: 'en-IN' })
+    queue.push({ text: item.explanation.malayalam, lang: 'ml' })
+    for (const ex of item.examples) {
+      queue.push({ text: ex.en, lang: 'en-IN' })
+      queue.push({ text: ex.ml, lang: 'ml' })
     }
-  }, [speakStep, stop])
+
+    const playItem = async (idx) => {
+      if (idx >= queue.length) { stop(); return }
+      const { text, lang } = queue[idx]
+      const chunks = splitTextIntoChunks(text, 150)
+
+      const playChunk = async (ci) => {
+        if (ci >= chunks.length) { playItem(idx + 1); return }
+        const audio = await fetchTtsAudio(chunks[ci], lang, () => playChunk(ci + 1))
+        if (!audio) { playChunk(ci + 1); return }
+        audio.playbackRate = lang === 'ml' ? speechRate * 0.85 : speechRate
+        activeAudioRef.current = audio
+        audio.onended = () => playChunk(ci + 1)
+        audio.onerror = () => playChunk(ci + 1)
+        audio.play().catch(() => playChunk(ci + 1))
+      }
+      playChunk(0)
+    }
+    playItem(0)
+  }, [speechRate, splitTextIntoChunks, stop, fetchTtsAudio])
 
   // Play a quiz explanation in Malayalam — chunked sequential blob playback
   const playExplanation = useCallback(async (explanationText) => {
@@ -401,6 +391,37 @@ function App() {
     playChunk(0)
   }, [speechRate, splitTextIntoChunks, stop, fetchTtsAudio])
 
+  // Resume paused audio
+  const resume = useCallback(() => {
+    if (activeAudioRef.current) {
+      setStatus('playing')
+      activeAudioRef.current.play().catch(err => console.error('Resume failed:', err))
+    }
+  }, [])
+
+  // Play the entire paragraph sequentially (phrase by phrase)
+  const playParagraph = useCallback((paraIdx) => {
+    if (status === 'paused' && playingParaIdx === paraIdx) {
+      resume()
+      return
+    }
+    stop()
+    setPlayMode('paragraph')
+    speakPhrase(paraIdx, 0, 0, true)
+  }, [status, playingParaIdx, speakPhrase, stop, resume])
+
+  // Play a single sentence phrase-by-phrase then stop
+  const playSentence = useCallback((paraIdx, _sentenceText, sentenceId) => {
+    stop()
+    const targetPara = STUDY_DATA[paraIdx]
+    if (!targetPara) return
+    const idx = targetPara.sentences.findIndex(s => s.id === sentenceId)
+    if (idx !== -1) {
+      setPlayMode('sentence')
+      speakPhrase(paraIdx, idx, 0, true)
+    }
+  }, [speakPhrase, stop])
+
   // Pause playback
   const pause = useCallback(() => {
     if (activeAudioRef.current) {
@@ -412,6 +433,7 @@ function App() {
     }
     setStatus('paused')
   }, [])
+
 
   // Clean speech, timers and blob object URLs on unmount
   useEffect(() => {
@@ -739,7 +761,16 @@ function App() {
               <div className="lecture-items-grid">
                 {GRAMMAR_LECTURE_DATA.prepositions.items.map((item, idx) => (
                   <div key={idx} className="lecture-item-card">
-                    <div className="lecture-item-badge">{item.word}</div>
+                    <div className="lecture-item-card-header">
+                      <div className="lecture-item-badge">{item.word}</div>
+                      <button
+                        className="grammar-listen-btn"
+                        onClick={() => playGrammarItem(item)}
+                        title={`Listen to ${item.word} explanation`}
+                      >
+                        🔊 Listen
+                      </button>
+                    </div>
                     <div className="lecture-item-explanation">
                       <p className="item-en"><strong>English:</strong> {item.explanation.english}</p>
                       <p className="item-ml"><strong>Malayalam:</strong> {item.explanation.malayalam}</p>
@@ -801,7 +832,16 @@ function App() {
               <div className="lecture-items-grid">
                 {GRAMMAR_LECTURE_DATA.articles.items.map((item, idx) => (
                   <div key={idx} className="lecture-item-card">
-                    <div className="lecture-item-badge article-badge">{item.word}</div>
+                    <div className="lecture-item-card-header">
+                      <div className="lecture-item-badge article-badge">{item.word}</div>
+                      <button
+                        className="grammar-listen-btn"
+                        onClick={() => playGrammarItem(item)}
+                        title={`Listen to ${item.word} explanation`}
+                      >
+                        🔊 Listen
+                      </button>
+                    </div>
                     <div className="lecture-item-explanation">
                       <p className="item-en"><strong>English:</strong> {item.explanation.english}</p>
                       <p className="item-ml"><strong>Malayalam:</strong> {item.explanation.malayalam}</p>

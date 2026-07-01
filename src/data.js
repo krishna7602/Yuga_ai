@@ -1,3 +1,10 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// STUDY_DATA
+//
+// Each sentence now has a `phrases` array for phrase-by-phrase bilingual reading.
+// Pattern: English phrase → Malayalam phrase → next English phrase → ...
+// The full `english` / `malayalam` strings remain for display / word-highlight.
+// ─────────────────────────────────────────────────────────────────────────────
 export const STUDY_DATA = [
   {
     id: 1,
@@ -7,51 +14,73 @@ export const STUDY_DATA = [
       {
         id: "s1-1",
         english: "The light was weak, even at noon.",
-        malayalam: "വെളിച്ചം വളരെ കുറവായിരുന്നു, ഉച്ചസമയത്ത് പോലും."
+        malayalam: "വെളിച്ചം വളരെ കുറവായിരുന്നു, ഉച്ചസമയത്ത് പോലും.",
+        phrases: [
+          { english: "The light was weak",          malayalam: "വെളിച്ചം വളരെ കുറവായിരുന്നു" },
+          { english: "even at noon.",               malayalam: "ഉച്ചസമയത്ത് പോലും." }
+        ]
       },
       {
         id: "s1-2",
         english: "When Pelayo was coming back to the house, it was hard for him to see what was moving and groaning in the rear of the courtyard.",
-        malayalam: "പെലായോ തിരികെ വീട്ടിലേക്ക് വരുമ്പോൾ, മുറ്റത്തിന്റെ പിന്നാമ്പുറത്ത് എന്തോ ഒന്ന് അനങ്ങുന്നതും മൂളുന്നതും വ്യക്തമായി കാണാൻ അവന് ബുദ്ധിമുട്ടായിരുന്നു."
+        malayalam: "പെലായോ തിരികെ വീട്ടിലേക്ക് വരുമ്പോൾ, മുറ്റത്തിന്റെ പിന്നാമ്പുറത്ത് എന്തോ ഒന്ന് അനങ്ങുന്നതും മൂളുന്നതും വ്യക്തമായി കാണാൻ അവന് ബുദ്ധിമുട്ടായിരുന്നു.",
+        phrases: [
+          { english: "When Pelayo was coming back to the house,", malayalam: "പെലായോ തിരികെ വീട്ടിലേക്ക് വരുമ്പോൾ," },
+          { english: "it was hard for him to see what was moving and groaning in the rear of the courtyard.", malayalam: "മുറ്റത്തിന്റെ പിന്നാമ്പുറത്ത് എന്തോ ഒന്ന് അനങ്ങുന്നതും മൂളുന്നതും വ്യക്തമായി കാണാൻ അവന് ബുദ്ധിമുട്ടായിരുന്നു." }
+        ]
       }
     ],
     vocabulary: [
-      { word: "Light was weak", meaning: "വെളിച്ചം കുറവായിരുന്നു / മങ്ങിയിരിക്കുകയായിരുന്നു." },
-      { word: "Even at noon", meaning: "ഉച്ചസമയത്ത് പോലും (സാധാരണ ഉച്ചയ്ക്ക് നല്ല വെളിച്ചം ഉണ്ടാകേണ്ടതാണ്, എന്നാൽ ഇവിടെ പ്രകൃതി ഇരുണ്ടതായിരുന്നു)." },
-      { word: "Rear", meaning: "പിന്നാമ്പുറം." },
-      { word: "Courtyard", meaning: "മുറ്റം." },
-      { word: "Moving", meaning: "അനങ്ങുന്ന." },
-      { word: "Groaning", meaning: "വേദനകൊണ്ട് മൂളുന്ന." }
+      { word: "Light was weak",  meaning: "വെളിച്ചം കുറവായിരുന്നു / മങ്ങിയിരിക്കുകയായിരുന്നു." },
+      { word: "Even at noon",    meaning: "ഉച്ചസമയത്ത് പോലും (സാധാരണ ഉച്ചയ്ക്ക് നല്ല വെളിച്ചം ഉണ്ടാകേണ്ടതാണ്, എന്നാൽ ഇവിടെ പ്രകൃതി ഇരുണ്ടതായിരുന്നു)." },
+      { word: "Rear",            meaning: "പിന്നാമ്പുറം." },
+      { word: "Courtyard",       meaning: "മുറ്റം." },
+      { word: "Moving",          meaning: "അനങ്ങുന്ന." },
+      { word: "Groaning",        meaning: "വേദനകൊണ്ട് മൂളുന്ന." }
     ]
   },
   {
     id: 2,
     title: "Paragraph 2",
-    englishText: "He had to go very close to see that it was an old man, a very old man. The man was lying face down in the mud. In spite of his tremendous efforts, the man couldn’t get up, impeded by his enormous wings.",
+    englishText: "He had to go very close to see that it was an old man, a very old man. The man was lying face down in the mud. In spite of his tremendous efforts, the man couldn't get up, impeded by his enormous wings.",
     sentences: [
       {
         id: "s2-1",
         english: "He had to go very close to see that it was an old man, a very old man.",
-        malayalam: "അതൊരു വൃദ്ധനാണെന്ന്, വളരെ പ്രായമായ ഒരു മനുഷ്യനാണെന്ന് തിരിച്ചറിയാൻ അവന് അയാളുടെ വളരെ അടുത്തേക്ക് പോകേണ്ടി വന്നു."
+        malayalam: "അതൊരു വൃദ്ധനാണെന്ന്, വളരെ പ്രായമായ ഒരു മനുഷ്യനാണെന്ന് തിരിച്ചറിയാൻ അവന് അയാളുടെ വളരെ അടുത്തേക്ക് പോകേണ്ടി വന്നു.",
+        phrases: [
+          { english: "He had to go very close",        malayalam: "അവന് അയാളുടെ വളരെ അടുത്തേക്ക് പോകേണ്ടി വന്നു" },
+          { english: "to see that it was an old man,", malayalam: "അതൊരു വൃദ്ധനാണെന്ന് തിരിച്ചറിയാൻ," },
+          { english: "a very old man.",                malayalam: "വളരെ പ്രായമായ ഒരു മനുഷ്യൻ." }
+        ]
       },
       {
         id: "s2-2",
         english: "The man was lying face down in the mud.",
-        malayalam: "ആ മനുഷ്യൻ ചെളിയിൽ കമിഴ്ന്നു വീണുകിടക്കുകയായിരുന്നു."
+        malayalam: "ആ മനുഷ്യൻ ചെളിയിൽ കമിഴ്ന്നു വീണുകിടക്കുകയായിരുന്നു.",
+        phrases: [
+          { english: "The man was lying face down", malayalam: "ആ മനുഷ്യൻ കമിഴ്ന്നു വീണുകിടക്കുകയായിരുന്നു" },
+          { english: "in the mud.",                 malayalam: "ചെളിയിൽ." }
+        ]
       },
       {
         id: "s2-3",
-        english: "In spite of his tremendous efforts, the man couldn’t get up, impeded by his enormous wings.",
-        malayalam: "തന്റെ പരമാവധി ശ്രമങ്ങൾ നടത്തിയിട്ടും ആ വൃദ്ധന് എഴുന്നേൽക്കാൻ കഴിഞ്ഞില്ല, അയാളുടെ ഭീമാകാരമായ വലിയ ചിറകുകൾ അതിന് തടസ്സമായി നിന്നു."
+        english: "In spite of his tremendous efforts, the man couldn't get up, impeded by his enormous wings.",
+        malayalam: "തന്റെ പരമാവധി ശ്രമങ്ങൾ നടത്തിയിട്ടും ആ വൃദ്ധന് എഴുന്നേൽക്കാൻ കഴിഞ്ഞില്ല, അയാളുടെ ഭീമാകാരമായ വലിയ ചിറകുകൾ അതിന് തടസ്സമായി നിന്നു.",
+        phrases: [
+          { english: "In spite of his tremendous efforts,", malayalam: "തന്റെ പരമാവധി ശ്രമങ്ങൾ നടത്തിയിട്ടും," },
+          { english: "the man couldn't get up,",            malayalam: "ആ വൃദ്ധന് എഴുന്നേൽക്കാൻ കഴിഞ്ഞില്ല," },
+          { english: "impeded by his enormous wings.",      malayalam: "അയാളുടെ ഭീമാകാരമായ വലിയ ചിറകുകൾ അതിന് തടസ്സമായി നിന്നു." }
+        ]
       }
     ],
     vocabulary: [
-      { word: "Face down", meaning: "മുഖം നിലത്തു കുത്തി / കമിഴ്ന്ന്." },
-      { word: "Mud", meaning: "ചെളി." },
-      { word: "In spite of", meaning: "ഉണ്ടായിരുന്നിട്ടും (ശ്രമിച്ചിട്ടും)." },
-      { word: "Tremendous efforts", meaning: "കഠിനമായ ശ്രമങ്ങൾ / പരമാവധി ശ്രമം." },
-      { word: "Impeded", meaning: "തടസ്സപ്പെട്ടു (എഴുന്നേൽക്കാൻ കഴിയാത്തവിധം തടസ്സമായി മാറി)." },
-      { word: "Enormous wings", meaning: "ഭീമാകാരമായ ചിറകുകൾ." }
+      { word: "Face down",         meaning: "മുഖം നിലത്തു കുത്തി / കമിഴ്ന്ന്." },
+      { word: "Mud",               meaning: "ചെളി." },
+      { word: "In spite of",       meaning: "ഉണ്ടായിരുന്നിട്ടും (ശ്രമിച്ചിട്ടും)." },
+      { word: "Tremendous efforts",meaning: "കഠിനമായ ശ്രമങ്ങൾ / പരമാവധി ശ്രമം." },
+      { word: "Impeded",           meaning: "തടസ്സപ്പെട്ടു (എഴുന്നേൽക്കാൻ കഴിയാത്തവിധം തടസ്സമായി മാറി)." },
+      { word: "Enormous wings",    meaning: "ഭീമാകാരമായ ചിറകുകൾ." }
     ]
   },
   {
@@ -62,21 +91,30 @@ export const STUDY_DATA = [
       {
         id: "s3-1",
         english: "Frightened by the sight, Pelayo ran to get Elisenda, his wife.",
-        malayalam: "ആ കാഴ്ച കണ്ട് ഭയന്നുപോയ പെലായോ, തന്റെ ഭാര്യയായ എലിസെൻഡയെ വിളിക്കാനായി ഓടി."
+        malayalam: "ആ കാഴ്ച കണ്ട് ഭയന്നുപോയ പെലായോ, തന്റെ ഭാര്യയായ എലിസെൻഡയെ വിളിക്കാനായി ഓടി.",
+        phrases: [
+          { english: "Frightened by the sight,",          malayalam: "ആ കാഴ്ച കണ്ട് ഭയന്നുപോയ," },
+          { english: "Pelayo ran to get Elisenda,",       malayalam: "പെലായോ എലിസെൻഡയെ വിളിക്കാനായി ഓടി," },
+          { english: "his wife.",                         malayalam: "തന്റെ ഭാര്യ." }
+        ]
       },
       {
         id: "s3-2",
         english: "She was putting compresses on their sick child.",
-        malayalam: "അവൾ അപ്പോൾ അവരുടെ സുഖമില്ലാത്ത കുഞ്ഞിന്റെ ശരീരത്തിൽ പനി മാറാൻ വേണ്ടി നനച്ച തുണി തുണ്ടുകൾ വെച്ചുകൊടുക്കുകയായിരുന്നു."
+        malayalam: "അവൾ അപ്പോൾ അവരുടെ സുഖമില്ലാത്ത കുഞ്ഞിന്റെ ശരീരത്തിൽ പനി മാറാൻ വേണ്ടി നനച്ച തുണി തുണ്ടുകൾ വെച്ചുകൊടുക്കുകയായിരുന്നു.",
+        phrases: [
+          { english: "She was putting compresses", malayalam: "അവൾ നനച്ച തുണി തുണ്ടുകൾ വെച്ചുകൊടുക്കുകയായിരുന്നു" },
+          { english: "on their sick child.",       malayalam: "അവരുടെ സുഖമില്ലാത്ത കുഞ്ഞിന്റെ ശരീരത്തിൽ." }
+        ]
       }
     ],
     vocabulary: [
-      { word: "Frightened", meaning: "ഭയന്നുപോയി / പേടിച്ചു." },
-      { word: "Sight", meaning: "കാഴ്ച." },
-      { word: "Ran to get", meaning: "വിളിക്കാൻ ഓടി / കൂട്ടിക്കൊണ്ടുവരാൻ ഓടി." },
-      { word: "Putting compresses", meaning: "നനച്ച തുണി ശരീരത്തിൽ വെക്കുക (പനി മാറ്റാൻ തുണി നനച്ചിടുന്ന രീതി)." },
-      { word: "Sick", meaning: "അсуഖം." },
-      { word: "Sick child", meaning: "അсуഖമുള്ള കുഞ്ഞ്." }
+      { word: "Frightened",        meaning: "ഭയന്നുപോയി / പേടിച്ചു." },
+      { word: "Sight",             meaning: "കാഴ്ച." },
+      { word: "Ran to get",        meaning: "വിളിക്കാൻ ഓടി / കൂട്ടിക്കൊണ്ടുവരാൻ ഓടി." },
+      { word: "Putting compresses",meaning: "നനച്ച തുണി ശരീരത്തിൽ വെക്കുക (പനി മാറ്റാൻ തുണി നനച്ചിടുന്ന രീതി)." },
+      { word: "Sick",              meaning: "സുഖമില്ലാത്ത." },
+      { word: "Sick child",        meaning: "സുഖമില്ലാത്ത കുഞ്ഞ്." }
     ]
   },
   {
@@ -87,19 +125,27 @@ export const STUDY_DATA = [
       {
         id: "s4-1",
         english: "He took her to the rear of the courtyard.",
-        malayalam: "അവൻ അവളെ മുറ്റത്തിന്റെ പിന്നാമ്പുറത്തേക്ക് കൂട്ടിക്കൊണ്ടുപോയി."
+        malayalam: "അവൻ അവളെ മുറ്റത്തിന്റെ പിന്നാമ്പുറത്തേക്ക് കൂട്ടിക്കൊണ്ടുപോയി.",
+        phrases: [
+          { english: "He took her",                       malayalam: "അവൻ അവളെ കൂട്ടിക്കൊണ്ടുപോയി" },
+          { english: "to the rear of the courtyard.",     malayalam: "മുറ്റത്തിന്റെ പിന്നാമ്പുറത്തേക്ക്." }
+        ]
       },
       {
         id: "s4-2",
         english: "They both looked at the fallen body.",
-        malayalam: "അവർ രണ്ടുപേരും ആ വീണുകിടക്കുന്ന ശരീരത്തിലേക്ക് നോക്കി."
+        malayalam: "അവർ രണ്ടുപേരും ആ വീണുകിടക്കുന്ന ശരീരത്തിലേക്ക് നോക്കി.",
+        phrases: [
+          { english: "They both looked at",       malayalam: "അവർ രണ്ടുപേരും നോക്കി" },
+          { english: "the fallen body.",          malayalam: "ആ വീണുകിടക്കുന്ന ശരീരത്തിലേക്ക്." }
+        ]
       }
     ],
     vocabulary: [
-      { word: "Rear", meaning: "പിന്നാമ്പുറം." },
-      { word: "Courtyard", meaning: "മുറ്റം." },
-      { word: "Rear of the courtyard", meaning: "മുറ്റത്തിന്റെ പിന്നാമ്പുറം." },
-      { word: "Fallen body", meaning: "നിലത്തുവീണു കിടക്കുന്ന ശരീരം." }
+      { word: "Rear",                   meaning: "പിന്നാമ്പുറം." },
+      { word: "Courtyard",              meaning: "മുറ്റം." },
+      { word: "Rear of the courtyard",  meaning: "മുറ്റത്തിന്റെ പിന്നാമ്പുറം." },
+      { word: "Fallen body",            meaning: "നിലത്തുവീണു കിടക്കുന്ന ശരീരം." }
     ]
   },
   {
@@ -110,44 +156,67 @@ export const STUDY_DATA = [
       {
         id: "s5-1",
         english: "The man was dressed like a ragpicker.",
-        malayalam: "ആ മനുഷ്യൻ ഒരു ആക്രിപെറുക്കുന്നവനെപ്പോലെയാണ് വസ്ത്രം ധരിച്ചിരുന്നത്."
+        malayalam: "ആ മനുഷ്യൻ ഒരു ആക്രിപെറുക്കുന്നവനെപ്പോലെയാണ് വസ്ത്രം ധരിച്ചിരുന്നത്.",
+        phrases: [
+          { english: "The man was dressed like a ragpicker.", malayalam: "ആ മനുഷ്യൻ ഒരു ആക്രിപെറുക്കുന്നവനെപ്പോലെയാണ് വസ്ത്രം ധരിച്ചിരുന്നത്." }
+        ]
       },
       {
         id: "s5-2",
         english: "There were only a few faded hairs left on his bald skull and very few teeth in his mouth.",
-        malayalam: "അയാളുടെ കഷണ്ടി തലയിൽ കുറച്ചു മങ്ങിയ മുടികൾ മാത്രമേ ബാക്കിയുണ്ടായിരുന്നുള്ളൂ, വായിലാകട്ടെ വളരെ കുറച്ചു പല്ലുകളും."
+        malayalam: "അയാളുടെ കഷണ്ടി തലയിൽ കുറച്ചു മങ്ങിയ മുടികൾ മാത്രമേ ബാക്കിയുണ്ടായിരുന്നുള്ളൂ, വായിലാകട്ടെ വളരെ കുറച്ചു പല്ലുകളും.",
+        phrases: [
+          { english: "There were only a few faded hairs left on his bald skull", malayalam: "അയാളുടെ കഷണ്ടി തലയിൽ കുറച്ചു മങ്ങിയ മുടികൾ മാത്രമേ ബാക്കിയുണ്ടായിരുന്നുള്ളൂ," },
+          { english: "and very few teeth in his mouth.",                         malayalam: "വായിലാകട്ടെ വളരെ കുറച്ചു പല്ലുകളും." }
+        ]
       },
       {
         id: "s5-3",
         english: "His pitiful condition seemed that of a drenched great-grandfather.",
-        malayalam: "നനഞ്ഞുകുതിർന്ന ഒരു മുത്തശ്ശന്റേതുപോലെയുള്ള ദയനീയമായ ഒരു അവസ്ഥയായിരുന്നു അയാളുടേത്."
+        malayalam: "നനഞ്ഞുകുതിർന്ന ഒരു മുത്തശ്ശന്റേതുപോലെയുള്ള ദയനീയമായ ഒരു അവസ്ഥയായിരുന്നു അയാളുടേത്.",
+        phrases: [
+          { english: "His pitiful condition",                          malayalam: "അയാളുടെ ദയനീയമായ അവസ്ഥ" },
+          { english: "seemed that of a drenched great-grandfather.",   malayalam: "നനഞ്ഞുകുതിർന്ന ഒരു മുത്തശ്ശന്റേതുപോലെ തോന്നിച്ചു." }
+        ]
       },
       {
         id: "s5-4",
         english: "This took away any sense of grandeur he might have had.",
-        malayalam: "ഇത് അയാൾക്ക് ഉണ്ടായേക്കാമായിരുന്ന എല്ലാവിധ പ്രൗഢിയും ഇല്ലാതാക്കി."
+        malayalam: "ഇത് അയാൾക്ക് ഉണ്ടായേക്കാമായിരുന്ന എല്ലാവിധ പ്രൗഢിയും ഇല്ലാതാക്കി.",
+        phrases: [
+          { english: "This took away any sense of grandeur", malayalam: "ഇത് ഏതൊരു പ്രൗഢിബോധവും ഇല്ലാതാക്കി" },
+          { english: "he might have had.",                   malayalam: "അയാൾക്ക് ഉണ്ടായേക്കാമായിരുന്ന." }
+        ]
       },
       {
         id: "s5-5",
         english: "His huge buzzard wings, dirty and half-plucked, were entangled in the mud.",
-        malayalam: "കഴുകന്റേതുപോലെയുള്ള അയാളുടെ വലിയ ചിറകുകൾ, അഴുക്കുപിടിച്ചതും പകുതിയും തൂവലുകൾ കൊഴിഞ്ഞതുമായിരുന്നു, അവ ചെളിയിൽ കുടുങ്ങിക്കിടക്കുകയായിരുന്നു."
+        malayalam: "കഴുകന്റേതുപോലെയുള്ള അയാളുടെ വലിയ ചിറകുകൾ, അഴുക്കുപിടിച്ചതും പകുതിയും തൂവലുകൾ കൊഴിഞ്ഞതുമായിരുന്നു, അവ ചെളിയിൽ കുടുങ്ങിക്കിടക്കുകയായിരുന്നു.",
+        phrases: [
+          { english: "His huge buzzard wings,",       malayalam: "കഴുകന്റേതുപോലെയുള്ള അയാളുടെ വലിയ ചിറകുകൾ," },
+          { english: "dirty and half-plucked,",       malayalam: "അഴുക്കുപിടിച്ചതും പകുതിയും തൂവലുകൾ കൊഴിഞ്ഞതുമായ," },
+          { english: "were entangled in the mud.",    malayalam: "ചെളിയിൽ കുടുങ്ങിക്കിടക്കുകയായിരുന്നു." }
+        ]
       }
     ],
     vocabulary: [
-      { word: "Ragpicker", meaning: "ആക്രിപെറുക്കുന്നയാൾ / അഴുക്കുതുണിപെറുക്കുന്നയാൾ." },
-      { word: "Faded hairs", meaning: "മങ്ങിയ / നിറംകെട്ട മുടികൾ." },
-      { word: "Bald skull", meaning: "കഷണ്ടിത്തല." },
+      { word: "Ragpicker",     meaning: "ആക്രിപെറുക്കുന്നയാൾ / അഴുക്കുതുണിപെറുക്കുന്നയാൾ." },
+      { word: "Faded hairs",   meaning: "മങ്ങിയ / നിറംകെട്ട മുടികൾ." },
+      { word: "Bald skull",    meaning: "കഷണ്ടിത്തല." },
       { word: "Pitiful condition", meaning: "ദയനീയമായ അവസ്ഥ." },
-      { word: "Drenched", meaning: "നനഞ്ഞുകുതിർന്ന." },
+      { word: "Drenched",      meaning: "നനഞ്ഞുകുതിർന്ന." },
       { word: "Great-grandfather", meaning: "മുത്തശ്ശൻ (അപ്പൂപ്പന്റെ അച്ഛൻ)." },
-      { word: "Grandeur", meaning: "പ്രൗഢി / രാജകീയത / വലിപ്പം." },
+      { word: "Grandeur",      meaning: "പ്രൗഢി / രാജകീയത / വലിപ്പം." },
       { word: "Buzzard wings", meaning: "കഴുകന്റേതുപോലെയുള്ള ചിറകുകൾ." },
-      { word: "Half-plucked", meaning: "പകുതി തൂവലുകൾ കൊഴിഞ്ഞ / പിഴുതെടുക്കപ്പെട്ട." },
-      { word: "Entangled", meaning: "കുടുങ്ങിക്കിടക്കുകയായിരുന്നു." }
+      { word: "Half-plucked",  meaning: "പകുതി തൂവലുകൾ കൊഴിഞ്ഞ / പിഴുതെടുക്കപ്പെട്ട." },
+      { word: "Entangled",     meaning: "കുടുങ്ങിക്കിടക്കുകയായിരുന്നു." }
     ]
   }
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GRAMMAR_LECTURE_DATA — updated examples for TO, IN, ON as requested
+// ─────────────────────────────────────────────────────────────────────────────
 export const GRAMMAR_LECTURE_DATA = {
   prepositions: {
     title: "Prepositions (ഗതികൾ)",
@@ -164,7 +233,7 @@ export const GRAMMAR_LECTURE_DATA = {
         },
         examples: [
           { en: "He is going to school.", ml: "അവൻ സ്കൂളിലേക്ക് പോകുന്നു." },
-          { en: "He took her to the courtyard.", ml: "അവൻ അവളെ മുറ്റത്തേക്ക് കൂട്ടിക്കൊണ്ടുപോയി." }
+          { en: "My father took me to the zoo.", ml: "എന്റെ അച്ഛൻ എന്നെ മൃഗശാലയിലേക്ക് കൂട്ടിക്കൊണ്ടുപോയി." }
         ]
       },
       {
@@ -175,7 +244,7 @@ export const GRAMMAR_LECTURE_DATA = {
         },
         examples: [
           { en: "The keys are in my pocket.", ml: "താക്കോലുകൾ എന്റെ പോക്കറ്റിനുള്ളിൽ ഉണ്ട്." },
-          { en: "There are few teeth in his mouth.", ml: "അയാളുടെ വായയ്ക്കുള്ളിൽ കുറച്ചു പല്ലുകളുണ്ട്." }
+          { en: "There are many books in the bag.", ml: "ബാഗിനുള്ളിൽ ഒരുപാട് പുസ്തകങ്ങളുണ്ട്." }
         ]
       },
       {
@@ -186,7 +255,7 @@ export const GRAMMAR_LECTURE_DATA = {
         },
         examples: [
           { en: "The book is on the table.", ml: "പുസ്തകം മേശയ്ക്ക് മുകളിലാണ്." },
-          { en: "A few hairs were left on his skull.", ml: "അയാളുടെ തലയോട്ടിക്ക് മുകളിൽ കുറച്ചു മുടി ഉണ്ടായിരുന്നു." }
+          { en: "He put the stamp on the letter.", ml: "അവൻ കത്തിന് മുകളിൽ സ്റ്റാമ്പ് ഒട്ടിച്ചു." }
         ]
       },
       {
@@ -224,12 +293,12 @@ export const GRAMMAR_LECTURE_DATA = {
       }
     ],
     table: [
-      { word: "To", shortcut: "Towards a destination", meaning: "ലേക്ക് / ലേയ്ക്ക്" },
-      { word: "In", shortcut: "Inside something", meaning: "ഉള്ളിൽ / ഇൽ" },
-      { word: "On", shortcut: "On top of a surface", meaning: "മുകളിൽ / മേൽ" },
-      { word: "At", shortcut: "Exact point / specific time", meaning: "ൽ / അടുത്ത് / ക്ക്" },
-      { word: "Of", shortcut: "Belonging to / Possession", meaning: "ഉടെ" },
-      { word: "With", shortcut: "Along with / Using a tool", meaning: "കൂടെ / ഒപ്പം / കൊണ്ട്" }
+      { word: "To",   shortcut: "Towards a destination",      meaning: "ലേക്ക് / ലേയ്ക്ക്" },
+      { word: "In",   shortcut: "Inside something",           meaning: "ഉള്ളിൽ / ഇൽ" },
+      { word: "On",   shortcut: "On top of a surface",        meaning: "മുകളിൽ / മേൽ" },
+      { word: "At",   shortcut: "Exact point / specific time",meaning: "ൽ / അടുത്ത് / ക്ക്" },
+      { word: "Of",   shortcut: "Belonging to / Possession",  meaning: "ഉടെ" },
+      { word: "With", shortcut: "Along with / Using a tool",  meaning: "കൂടെ / ഒപ്പം / കൊണ്ട്" }
     ]
   },
   articles: {
@@ -281,9 +350,9 @@ export const GRAMMAR_LECTURE_DATA = {
       }
     ],
     table: [
-      { article: "A", rule: "Consonant Sound (വ്യഞ്ജന ശബ്ദം)", meaning: "ഒരു (പൊതുവായത്)" },
-      { article: "An", rule: "Vowel Sound (സ്വര ശബ്ദം)", meaning: "ഒരു (പൊതുവായത്)" },
-      { article: "The", rule: "Specific / Already Known / Unique", meaning: "ആ (പ്രത്യേകം എടുത്തു പറയുന്ന ഒന്ന്)" }
+      { article: "A",   rule: "Consonant Sound (വ്യഞ്ജന ശബ്ദം)",       meaning: "ഒരു (പൊതുവായത്)" },
+      { article: "An",  rule: "Vowel Sound (സ്വര ശബ്ദം)",              meaning: "ഒരു (പൊതുവായത്)" },
+      { article: "The", rule: "Specific / Already Known / Unique",     meaning: "ആ (പ്രത്യേകം എടുത്തു പറയുന്ന ഒന്ന്)" }
     ]
   }
 };
@@ -308,7 +377,7 @@ export const GRAMMAR_QUIZ_DATA = [
     question: "The man was dressed like ............. rag picker.",
     options: ["of", "the", "an", "a"],
     correctAnswer: "a",
-    explanation: "ഇവിടെ 'a' ആണ് ശരിയായ ഉത്തരം. കാരണം, ഒരു വ്യക്തിയോ വസ്തുവോ ഏത് തരത്തിൽ പെട്ടതാണെന്ന് പൊതുവായി വ്യക്തമാക്കുമ്പോഴാണ് നമ്മൾ Indefinite Article ആയ 'a' ഉപയോഗിക്കുന്നത്. grocery- പോലുള്ള പൊതുവായ തരങ്ങളെ സൂചിപ്പിക്കാൻ ഇത് വരുന്നു. അയാൾ ഒരു ആക്രിപെറുക്കുന്നവനെപ്പോലെ (rag picker) വസ്ത്രം ധരിച്ചിരുന്നു എന്നാണ് ഈ വരിയുടെ അർത്ഥം. ഇവിടെ 'rag picker' എന്നത് ഒരു പൊതുവായ തൊഴിലിനെയോ ഗ്രൂപ്പിനെയോ ആണ് സൂചിപ്പിക്കുന്നത്, അല്ലാതെ നമുക്ക് മുൻപേ പരിചയമുള്ള ഒരു പ്രത്യേക വ്യക്തിയെക്കുറിച്ചല്ല പറയുന്നത്. സിംഗുലർ ആയ (ഒരു വചനം) നാമപദങ്ങൾക്ക് മുൻപിൽ 'ഒരു' എന്ന അർത്ഥം വരാൻ നമ്മൾ 'a' ഉപയോഗിക്കുന്നു."
+    explanation: "ഇവിടെ 'a' ആണ് ശരിയായ ഉത്തരം. കാരണം, ഒരു വ്യക്തിയോ വസ്തുവോ ഏത് തരത്തിൽ പെട്ടതാണെന്ന് പൊതുവായി വ്യക്തമാക്കുമ്പോഴാണ് നമ്മൾ Indefinite Article ആയ 'a' ഉപയോഗിക്കുന്നത്. അയാൾ ഒരു ആക്രിപെറുക്കുന്നവനെപ്പോലെ (rag picker) വസ്ത്രം ധരിച്ചിരുന്നു എന്നാണ് ഈ വരിയുടെ അർത്ഥം. ഇവിടെ 'rag picker' എന്നത് ഒരു പൊതുവായ തൊഴിലിനെയോ ഗ്രൂപ്പിനെയോ ആണ് സൂചിപ്പിക്കുന്നത്, അല്ലാതെ നമുക്ക് മുൻപേ പരിചയമുള്ള ഒരു പ്രത്യേക വ്യക്തിയെക്കുറിച്ചല്ല പറയുന്നത്. സിംഗുലർ ആയ (ഒരു വചനം) നാമപദങ്ങൾക്ക് മുൻപിൽ 'ഒരു' എന്ന അർത്ഥം വരാൻ നമ്മൾ 'a' ഉപയോഗിക്കുന്നു."
   },
   {
     id: 4,

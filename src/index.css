@@ -1109,3 +1109,39 @@ body {
   border-top: 1px solid var(--vocab-border);
   margin-top: 32px;
 }
+
+/* ── Grammar item card header: badge + listen button side by side ── */
+.lecture-item-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* 🔊 Listen button on grammar cards */
+.grammar-listen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--accent-color);
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--text-highlight);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.grammar-listen-btn:hover {
+  background: rgba(59, 130, 246, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+}
+.grammar-listen-btn:active {
+  transform: scale(0.97);
+}
+
